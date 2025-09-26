@@ -1,0 +1,29 @@
+# -----------------------
+# Streamlit UI
+# -----------------------
+st.set_page_config(page_title="Supply Chain Blockchain Tracker", layout="wide")
+st.title("🚚 Blockchain Supply Chain Tracker")
+
+BC = SimpleBlockchain(storage_file="chain_store.json")
+
+# Instead of sidebar, we move logging form to right column
+col1, col2 = st.columns([2,1])
+
+with col1:
+    st.subheader("Search product journey")
+    q = st.text_input("Enter Product ID to view journey", value="PROD-001")
+    if st.button("🔎 View journey") or q:
+        q = q.strip()
+        if not q:
+            st.warning("Enter a product ID first.")
+        else:
+            hist = BC.get_product_history(q)
+            if not hist:
+                st.info(f"No records found for `{q}`.")
+            else:
+                # Show steps as cards instead of raw JSON
+                for step in hist:
+                    st.markdown(f"""
+                    <div style="padding:15px; margin-bottom:10px; border-radius:10px; background-color:#1E1E1E; box-shadow:0px 0px 8px rgba(255,255,255,0.1);">
+                        <h4>🧾 Step {step["_block_index"]}</h4>
+                        <b>Role:<
